@@ -34,6 +34,12 @@
 				},
 				{
 					"name": "filter1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn6"
 				}
 			],
 			"scriptLines": [
@@ -79,7 +85,22 @@
 				"        '\"', ''),\r",
 				"    'dd MMMM yyyy')\r",
 				")) ~> derivedColumn5",
-				"derivedColumn5 filter(cantidad>0 && !isNull(precio_unitario) && !isNull(fecha)) ~> filter1"
+				"derivedColumn5 filter(cantidad>0 && !isNull(precio_unitario) && !isNull(fecha)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          id_venta,",
+				"          fecha,",
+				"          producto,",
+				"          cantidad,",
+				"          precio_unitario,",
+				"          sucursal,",
+				"          vendedor,",
+				"          cliente_nombre,",
+				"          cliente_email,",
+				"          metodo_pago",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(canal = 'Sucursal') ~> derivedColumn6"
 			]
 		}
 	}
