@@ -22,6 +22,15 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
 				}
 			],
 			"scriptLines": [
@@ -71,7 +80,22 @@
 				"          metodo_pago = trim(metodo_pago),",
 				"          estatus = trim(estatus),",
 				"          costo_envio = trim(costo_envio),",
-				"          cliente = trim(cliente)) ~> derivedColumn1"
+				"          cliente = trim(cliente)) ~> derivedColumn1",
+				"derivedColumn1 derive(producto = initCap(regexReplace(producto, '\\\\s+', ' '))) ~> derivedColumn2",
+				"derivedColumn2 derive(cliente_ciudad = case(\r",
+				"    in(['lp','lpz','la paz','lapaz','l.p.'], lower(trim(cliente_ciudad))), 'La Paz',\r",
+				"    in(['scz','sc','santa cruz','sta cruz','sta. cruz','santa cruz de la sierra'], lower(trim(cliente_ciudad))), 'Santa Cruz',\r",
+				"    in(['cbba','cochabamba','cocha'], lower(trim(cliente_ciudad))), 'Cochabamba',\r",
+				"    in(['oruro'], lower(trim(cliente_ciudad))), 'Oruro',\r",
+				"    in(['potosi','potosí','pts'], lower(trim(cliente_ciudad))), 'Potosí',\r",
+				"    in(['tarija','tja'], lower(trim(cliente_ciudad))), 'Tarija',\r",
+				"    in(['sucre','chuquisaca','chq'], lower(trim(cliente_ciudad))), 'Sucre',\r",
+				"    in(['cobija','pando'], lower(trim(cliente_ciudad))), 'Cobija',\r",
+				"    in(['trinidad','beni'], lower(trim(cliente_ciudad))), 'Trinidad',\r",
+				"    'Desconocido'\r",
+				")) ~> derivedColumn3",
+				"derivedColumn3 derive(cantidad = toInteger(cantidad),",
+				"          precio_unitario = toFloat(regexReplace(toString(precio_unitario), '[^0-9.]', ''))) ~> derivedColumn4"
 			]
 		}
 	}
