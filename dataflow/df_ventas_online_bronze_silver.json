@@ -1,0 +1,78 @@
+{
+	"name": "df_ventas_online_bronze_silver",
+	"properties": {
+		"folder": {
+			"name": "Bronze"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Ventas_online_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          order_id as string,",
+				"          timestamp as string,",
+				"          product as string,",
+				"          qty as string,",
+				"          unit_price as string,",
+				"          {customer/name} as string,",
+				"          {customer/email} as string,",
+				"          {customer/city} as string,",
+				"          payment_method as string,",
+				"          status as string,",
+				"          shipping_cost as string,",
+				"          channel as string,",
+				"          customer as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          id_orden = order_id,",
+				"          fecha = timestamp,",
+				"          producto = product,",
+				"          cantidad = qty,",
+				"          precio_unitario = unit_price,",
+				"          nombre_cliente = {customer/name},",
+				"          cliente_email = {customer/email},",
+				"          cliente_ciudad = {customer/city},",
+				"          metodo_pago = payment_method,",
+				"          estatus = status,",
+				"          costo_envio = shipping_cost,",
+				"          canal = channel,",
+				"          cliente = customer",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(id_orden = trim(id_orden),",
+				"          fecha = trim(fecha),",
+				"          producto = trim(producto),",
+				"          cantidad = trim(cantidad),",
+				"          precio_unitario = trim(precio_unitario),",
+				"          nombre_cliente = trim(nombre_cliente),",
+				"          cliente_email = trim(cliente_email),",
+				"          cliente_ciudad = trim(cliente_ciudad),",
+				"          metodo_pago = trim(metodo_pago),",
+				"          estatus = trim(estatus),",
+				"          costo_envio = trim(costo_envio),",
+				"          cliente = trim(cliente)) ~> derivedColumn1"
+			]
+		}
+	}
+}
