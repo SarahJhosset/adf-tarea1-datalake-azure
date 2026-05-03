@@ -25,6 +25,18 @@
 				},
 				{
 					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -70,7 +82,28 @@
 				"derivedColumn1 derive(sucursal = iif(\r",
 				"    in(['LPZ','La Paz','LP','lp','la paz','LA PAZ','Lapaz','L.P.'], sucursal), 'La Paz', sucursal\r",
 				"),",
-				"          canal = 'Sucursal') ~> derivedColumn2"
+				"          canal = 'Sucursal') ~> derivedColumn2",
+				"derivedColumn2 derive(fecha = coalesce(\r",
+				"    toDate(replace(fecha, '\"', ''), 'yyyy-MM-dd'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'dd-MM-yyyy'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'MM-dd-yyyy'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'dd/MM/yyyy'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'yyyy/MM/dd'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'dd-MMM-yyyy'),\r",
+				"    toDate(replace(fecha, '\"', ''), 'dd/MMM/yyyy'),\r",
+				"    \r",
+				"    toDate(replace(fecha, '\"', ''), 'MMMM dd, yyyy'),\r",
+				"    \r",
+				"    toDate(\r",
+				"        replace(\r",
+				"            replace(fecha, ' de ', ' '),\r",
+				"        '\"', ''),\r",
+				"    'dd MMMM yyyy')\r",
+				")) ~> derivedColumn3",
+				"derivedColumn3 derive(cantidad = toInteger(cantidad),",
+				"          precio_unitario = toFloat(regexReplace(toString(precio_unitario), '[^0-9.]', ''))) ~> derivedColumn4",
+				"derivedColumn4 derive(producto = initCap(regexReplace(producto, '\\\\s+', ' '))) ~> derivedColumn5",
+				"derivedColumn5 filter(cantidad>0 && !isNull(precio_unitario) && !isNull(fecha)) ~> filter1"
 			]
 		}
 	}
